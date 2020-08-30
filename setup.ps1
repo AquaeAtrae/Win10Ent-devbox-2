@@ -1,4 +1,3 @@
-@@ -0,0 +1,254 @@
 'RUNNING: setup.ps1'
 'Installs Chocolatey, Boxstarter, and runs next script to build fresh Windows 10 machine.'
 ''
