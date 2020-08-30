@@ -97,44 +97,55 @@ Disable-MicrosoftUpdate
 #######################
 # Timezone, Hostname & Domain
 
-# Setting Time Zone
+if ($TzHostDomainDone) {
 
-$TimeZone = Read-Host "Time zone ($(Get-TimeZone))"
-if ($TimeZone -ne '') {
-	Write-BoxstarterMessage "Setting time zone to $TimeZone"
-	# & C:\Windows\system32\tzutil /s "$TimeZone"
-	Set-TimeZone -Id $TimeZone
+	$TimeZone = Read-Host "Time zone ($(Get-Timezone).Id)"
+	if ([string]::IsNullOrEmpty($TimeZone)) {
+		$TimeZone = $(Get-Timezone).Id  # no change
+	}
+	else {
+		Write-BoxstarterMessage "Setting time zone to $TimeZone"
+		# & C:\Windows\system32\tzutil /s "$TimeZone"
+		Set-TimeZone -Id $TimeZone
+	}
+
+	$ComputerName = Read-Host "Computer name ($env:ComputerName)"
+	if ([string]::IsNullOrEmpty($ComputerName)) {
+		$ComputerName = $env:ComputerName  # no change
+	}
+	else {
+		# Rename computer (boxstarter will reboot and resume script)
+		Write-BoxstarterMessage "Setting computer host name to $ComputerName"
+		Rename-Computer -NewName $ComputerName -LocalCredential $LocalCredential -Restart
+	}
+
+	$DomainName = Read-Host "Domain ($((Get-WmiObject Win32_ComputerSystem).Domain))"
+	if ([string]::IsNullOrEmpty($DomainName)) {
+		$DomainName = $((Get-WmiObject Win32_ComputerSystem).Domain)
+	}
+	else {
+		# Join domain
+		#   better method? https://powershell.one/wmi/root/cimv2/win32_computersystem-JoinDomainOrWorkgroup
+		Function Join-Domain { 
+			param( 
+							[string]$Domain=$(read-host "Please specify the domain to join"), 
+							[System.Management.Automation.PSCredential]$Credential = $(Get-Credential) 
+							) 
+			$CS = Get-WmiObject Win32_ComputerSystem
+			$CS.JoinDomainOrWorkgroup($Domain,$Credential.GetNetworkCredential().Password,$Credential.UserName,$null,3) 
+		} 
+
+		Write-BoxstarterMessage "Setting Domain to $DomainName"
+		'Requires Domain Admin credentials'
+		Join-Domain $DomainName
+	}
+
+	$TzHostDomainDone = $true
+
+	'DONE: TimeZone, Computer Name, Domain.'
+	[console]::beep(500,300) # pitch, ms
+
 }
-
-$ComputerName = Read-Host "Computer name ($env:ComputerName)"
-if ($ComputerName -eq '') {$ComputerName = $env:ComputerName}
-
-$DomainName = Read-Host "Domain ($((Get-WmiObject Win32_ComputerSystem).Domain))"
-if ($DomainName -eq '') {$DomainName = $((Get-WmiObject Win32_ComputerSystem).Domain) }
-
-if ($env:ComputerName -ne $ComputerName) {
-	# Rename computer (boxstarter will reboot and resume script)
-	Rename-Computer -NewName $ComputerName -LocalCredential $LocalCredential -Restart
-}
-
-if ($((Get-WmiObject Win32_ComputerSystem).Domain) -ne $DomainName) {
-  # Join domain
-  Function Join-Domain { 
-    param( 
-            [string]$domain=$(read-host "Please specify the domain to join"), 
-            [System.Management.Automation.PSCredential]$Credential = $(Get-Credential) 
-            ) 
-    $CS = Get-WmiObject Win32_ComputerSystem
-    $CS.JoinDomainOrWorkgroup($Domain,$Credential.GetNetworkCredential().Password,$Credential.UserName,$null,3) 
-  } 
-
-  Join-Domain $DomainName
-}
-
-'DONE: TimeZone, Computer Name, Domain.'
-[console]::beep(500,300) # pitch, ms
-read-host "Press ENTER to continue or Ctrl-C to stop..."
-
 
 #######################
 # RDP Remote Access, PS Remoting, Ansible, Jump Desktop, OpenVPN with configs, Firewall rules
@@ -200,9 +211,12 @@ if ($winVer -ge 2004) {
 if ($features.disable) {
   Disable-WindowsOptionalFeature -FeatureName $features.disable -Online -NoRestart
 }
-Enable-WindowsOptionalFeature -FeatureName $features.enable -Online -All -NoRestart
+if ($features.disable) {
+	Enable-WindowsOptionalFeature -FeatureName $features.enable -Online -All -NoRestart
+}
 
 'DONE: Windows 10 Features enabled.'
+'NEXT: WSL2 Kernel Update?'
 [console]::beep(500,300) # pitch, ms
 read-host "Press ENTER to continue or Ctrl-C to stop..."
 
