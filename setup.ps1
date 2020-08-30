@@ -215,12 +215,46 @@ if ($features.disable) {
 	Enable-WindowsOptionalFeature -FeatureName $features.enable -Online -All -NoRestart
 }
 
-'DONE: Windows 10 Features enabled.'
+'DONE: Windows 10 Features enabled'
+''
+#######################
+# WSL2
+
 'NEXT: WSL2 Kernel Update?'
+'  Start-Process msiexec.exe -Wait -ArgumentList ''/I https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi /quiet /qn /norestart'' '
 [console]::beep(500,300) # pitch, ms
 read-host "Press ENTER to continue or Ctrl-C to stop..."
 
-'Installing software.'
+
+$winVer = [int](Get-Item "HKLM:SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue('ReleaseID')
+if ($winVer -ge 2004) {
+  RefreshEnv
+  wsl --set-default-version 2
+}
+
+if (!(Get-Command "ubuntu2004.exe" -ErrorAction SilentlyContinue)) {
+  $item = "wslubuntu2004"
+  $file = "$env:TEMP\$item.appx"
+  Write-Host "Downloading $item"
+  curl.exe -sL https://aka.ms/$item -o $file
+  Add-AppxPackage $file
+  Remove-Item $file
+
+  RefreshEnv
+
+  Ubuntu2004 install --root
+  Ubuntu2004 config --default-user root
+  Ubuntu2004 run "curl -sL '$helperUri/WSL.sh' | bash"
+  
+  Ubuntu2004 run passwd AquaeAtrae
+  Ubuntu2004 config --default-user AquaeAtrae
+}
+
+
+#######################
+# Installing software
+
+'Installing software...'
 
 choco install windows-adk-all   # WinPE builder
 
