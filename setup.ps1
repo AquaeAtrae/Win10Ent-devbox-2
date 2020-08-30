@@ -140,6 +140,8 @@ if ($TzHostDomainDone) {
 		Join-Domain $DomainName
 	}
 
+  [System.Management.Automation.PSCredential]$WSLCredential = $(Get-Credential -UserName $UserName -Message "Set your WSL Linux password")
+
 	$TzHostDomainDone = $true
 
 	'DONE: TimeZone, Computer Name, Domain.'
@@ -223,7 +225,7 @@ if ($features.disable) {
 'NEXT: WSL2 Kernel Update?'
 '  Start-Process msiexec.exe -Wait -ArgumentList ''/I https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi /passive'' '
 [console]::beep(500,300) # pitch, ms
-read-host "Press ENTER to continue or Ctrl-C to stop..."
+# read-host "Press ENTER to continue or Ctrl-C to stop..."
 
 
 # Start-Process msiexec.exe -Wait -ArgumentList '/I https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi /quiet /qn /norestart'
@@ -248,14 +250,20 @@ if (!(Get-Command "ubuntu2004.exe" -ErrorAction SilentlyContinue)) {
   Ubuntu2004 install --root
   Ubuntu2004 config --default-user root
   Ubuntu2004 run "curl -sL '$helperUri/WSL.sh' | bash"
+	# Ubuntu2004 run "curl -sL '$helperUri/WSL.sh' | sed -En ""s/USERNAME/$UserName/g"" | bash"
   
-  Ubuntu2004 run passwd AquaeAtrae
-  Ubuntu2004 config --default-user AquaeAtrae
+	'Linux password: '
+	[console]::beep(500,300) # pitch, ms
+  Ubuntu2004 run passwd $UserName
+	
+	# Ubuntu2004 run "echo '$UserName:$WSLCredential.GetNetworkCredential().Password' | chpasswd"
+	
+  Ubuntu2004 config --default-user $UserName
 }
 
 'DONE: WSL2 installed.'
 [console]::beep(500,300) # pitch, ms
-read-host "Press ENTER to continue or Ctrl-C to stop..."
+#read-host "Press ENTER to continue or Ctrl-C to stop..."
 
 #######################
 # Installing software
@@ -299,7 +307,7 @@ choco install autohotkey
 
 'DONE: Software installed.'
 [console]::beep(500,300) # pitch, ms
-read-host "Press ENTER to continue or Ctrl-C to stop..."
+#read-host "Press ENTER to continue or Ctrl-C to stop..."
 
 
 Enable-UAC
