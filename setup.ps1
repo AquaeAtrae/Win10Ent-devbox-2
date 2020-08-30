@@ -6,13 +6,13 @@
 
 
 # USAGE using Powershell (Admin): 
-#   START https://boxstarter.org/package/url?https://gist.githubusercontent.com/AquaeAtrae/6e9347f9fdc4efa5f6d81b1de4e962b4/raw/setup.ps1
+#   START https://boxstarter.org/package/url?https://raw.githubusercontent.com/AquaeAtrae/Win10Ent-devbox-2/master/setup.ps1
 #
 # USAGE:
 #   PowerShell.exe -ExecutionPolicy Bypass -File .\setup.ps1
 #
 # USAGE: 
-#   PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://gist.githubusercontent.com/AquaeAtrae/6e9347f9fdc4efa5f6d81b1de4e962b4/raw/setup.ps1'))"
+#   PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/AquaeAtrae/Win10Ent-devbox-2/master/setup.ps1'))"
 #
 
 # PREREQUISITES:
