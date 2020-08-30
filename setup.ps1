@@ -221,10 +221,13 @@ if ($features.disable) {
 # WSL2
 
 'NEXT: WSL2 Kernel Update?'
-'  Start-Process msiexec.exe -Wait -ArgumentList ''/I https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi /quiet /qn /norestart'' '
+'  Start-Process msiexec.exe -Wait -ArgumentList ''/I https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi /passive'' '
 [console]::beep(500,300) # pitch, ms
 read-host "Press ENTER to continue or Ctrl-C to stop..."
 
+
+# Start-Process msiexec.exe -Wait -ArgumentList '/I https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi /quiet /qn /norestart'
+Start-Process msiexec.exe -Wait -ArgumentList '/I https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi /passive'
 
 $winVer = [int](Get-Item "HKLM:SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue('ReleaseID')
 if ($winVer -ge 2004) {
@@ -250,6 +253,9 @@ if (!(Get-Command "ubuntu2004.exe" -ErrorAction SilentlyContinue)) {
   Ubuntu2004 config --default-user AquaeAtrae
 }
 
+'DONE: WSL2 installed.'
+[console]::beep(500,300) # pitch, ms
+read-host "Press ENTER to continue or Ctrl-C to stop..."
 
 #######################
 # Installing software
