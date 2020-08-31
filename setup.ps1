@@ -252,11 +252,14 @@ if (!(Get-Command "ubuntu2004.exe" -ErrorAction SilentlyContinue)) {
   Ubuntu2004 run "curl -sL '$helperUri/WSL.sh' | bash"
 	# Ubuntu2004 run "curl -sL '$helperUri/WSL.sh' | sed -En ""s/USERNAME/$UserName/g"" | bash"
   
-	'Linux password: '
-	[console]::beep(500,300) # pitch, ms
-  Ubuntu2004 run passwd $UserName
+	Ubuntu2004 run "useradd -m -s '/usr/bin/bash' -G sudo ${UserName}"
 	
-	# Ubuntu2004 run "echo '$UserName:$WSLCredential.GetNetworkCredential().Password' | chpasswd"
+	'Setting WSL password'
+	[console]::beep(500,300) # pitch, ms
+  #Ubuntu2004 run passwd $UserName
+	
+	$sh = "echo '${UserName}:" + $WSLCredential.GetNetworkCredential().Password + "' | sudo chpasswd"
+	Ubuntu2004 run $sh
 	
   Ubuntu2004 config --default-user $UserName
 }
