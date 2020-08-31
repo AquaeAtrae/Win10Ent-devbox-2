@@ -23,7 +23,3 @@ apt-get install -y ruby ruby-dev ruby-bundler zlib1g-dev
 
 curl -sL https://deb.nodesource.com/setup_14.x | bash -
 apt-get install -y nodejs
-
-# create user
-
-useradd -m -s "$(which bash)" -G sudo AquaeAtrae
