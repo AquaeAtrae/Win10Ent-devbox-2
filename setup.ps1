@@ -97,7 +97,7 @@ Disable-MicrosoftUpdate
 #######################
 # Timezone, Hostname & Domain
 
-if ($TzHostDomainDone) {
+if (-not $TzHostDomainDone) {
 
 	$TimeZone = Read-Host "Time zone ($(Get-Timezone).Id)"
 	if ([string]::IsNullOrEmpty($TimeZone)) {
@@ -213,7 +213,7 @@ if ($winVer -ge 2004) {
 if ($features.disable) {
   Disable-WindowsOptionalFeature -FeatureName $features.disable -Online -NoRestart
 }
-if ($features.disable) {
+if ($features.enable) {
 	Enable-WindowsOptionalFeature -FeatureName $features.enable -Online -All -NoRestart
 }
 
