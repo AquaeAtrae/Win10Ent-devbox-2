@@ -99,9 +99,10 @@ Disable-MicrosoftUpdate
 
 if (-not $TzHostDomainDone) {
 
-	$TimeZone = Read-Host "Time zone ($(Get-Timezone).Id)"
+  $OrigTimezone = $(Get-Timezone).Id
+	$TimeZone = Read-Host "Time zone ($OrigTimezone)"
 	if ([string]::IsNullOrEmpty($TimeZone)) {
-		$TimeZone = $(Get-Timezone).Id  # no change
+		$TimeZone = $OrigTimezone  # no change
 	}
 	else {
 		Write-BoxstarterMessage "Setting time zone to $TimeZone"
@@ -119,9 +120,10 @@ if (-not $TzHostDomainDone) {
 		Rename-Computer -NewName $ComputerName -LocalCredential $LocalCredential -Restart
 	}
 
-	$DomainName = Read-Host "Domain ($((Get-WmiObject Win32_ComputerSystem).Domain))"
+  $OrigDomain = $((Get-WmiObject Win32_ComputerSystem).Domain)
+	$DomainName = Read-Host "Domain ($OrigDomain)"
 	if ([string]::IsNullOrEmpty($DomainName)) {
-		$DomainName = $((Get-WmiObject Win32_ComputerSystem).Domain)
+		$DomainName = $OrigDomain
 	}
 	else {
 		# Join domain
