@@ -215,9 +215,9 @@ if ($winVer -ge 2004) {
 if ($features.disable) {
   Disable-WindowsOptionalFeature -FeatureName $features.disable -Online -NoRestart
 }
-if ($features.enable) {
-	Enable-WindowsOptionalFeature -FeatureName $features.enable -Online -All -NoRestart
-}
+
+Enable-WindowsOptionalFeature -FeatureName $features.enable -Online -All -NoRestart
+
 
 'DONE: Windows 10 Features enabled'
 ''
