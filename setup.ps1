@@ -98,9 +98,10 @@ Disable-MicrosoftUpdate
 # Timezone, Hostname & Domain
 
 refreshenv
-'Timezone/Host/Domain already done: $env:TzHostDomainDone'
+$TzHostDomainDone = [System.Environment]::GetEnvironmentVariable("TzHostDomainDone", [System.EnvironmentVariableTarget]::Machine)
+'Timezone/Host/Domain already done: $TzHostDomainDone'
 
-if (-not $env:TzHostDomainDone) {
+if (-not $TzHostDomainDone) {
 
   $OrigTimezone = $(Get-Timezone).Id
 	$TimeZone = Read-Host "Time zone ($OrigTimezone)"
@@ -317,7 +318,7 @@ choco install 7zip
 [console]::beep(500,300) # pitch, ms
 #read-host "Press ENTER to continue or Ctrl-C to stop..."
 
-# Remove-Item env:TzHostDomainDone
+# 	[System.Environment]::SetEnvironmentVariable('TzHostDomainDone', $null, [System.EnvironmentVariableTarget]::Machine)  # clear variable
 
 Enable-UAC
 Enable-MicrosoftUpdate
