@@ -103,6 +103,11 @@ $TzHostDomainDone = [System.Environment]::GetEnvironmentVariable("TzHostDomainDo
 
 if (-not $TzHostDomainDone) {
 
+  $WSLUserName = $UserName.ToLower() -replace "[: ]", ""  # lowercase username stripped of invalid characters
+
+	# TO DO: alternatively, just force password change after first login?
+  [System.Management.Automation.PSCredential]$WSLCredential = $(Get-Credential -UserName $UserName -Message "Set WSL Linux username and initial password")
+
   $OrigTimezone = $(Get-Timezone).Id
 	$TimeZone = Read-Host "Time zone ($OrigTimezone)"
 	if ([string]::IsNullOrEmpty($TimeZone)) {
@@ -145,8 +150,6 @@ if (-not $TzHostDomainDone) {
 		'Requires Domain Admin credentials'
 		Join-Domain $DomainName
 	}
-
-  [System.Management.Automation.PSCredential]$WSLCredential = $(Get-Credential -UserName $UserName -Message "Set your WSL Linux password")
 
 	[System.Environment]::SetEnvironmentVariable('TzHostDomainDone', $true, [System.EnvironmentVariableTarget]::Machine)
 
@@ -264,8 +267,7 @@ if (!(Get-Command "ubuntu2004.exe" -ErrorAction SilentlyContinue)) {
 	[console]::beep(500,300) # pitch, ms
   #Ubuntu2004 run passwd $UserName
 	
-	$sh = "echo '${UserName}:" + $WSLCredential.GetNetworkCredential().Password + "' | sudo chpasswd"
-	Ubuntu2004 run $sh
+	Ubuntu2004 run "printf ""%s:%s\n"" """ + $WSLCredential.GetNetworkCredential().UserName + """ """ + $WSLCredential.GetNetworkCredential().Password + """ | chpasswd"
 	
   Ubuntu2004 config --default-user $UserName
 }
@@ -281,13 +283,14 @@ if (!(Get-Command "ubuntu2004.exe" -ErrorAction SilentlyContinue)) {
 
 choco install windows-adk-all   # WinPE builder
 
+choco install pwsh `
+  microsoft-windows-terminal `
+
+cinst notepadplusplus
+
 choco install sysinternals
 choco install linkshellextension
 
-#######################
-# Chrome, Firefox Developer, Safari, Click-Once extensions
-
-cinst google-chrome-x64
 
 #######################
 # NextCloud, Google Drive, KeePass, Authy, Putty, winscp, OpenVPN, SSH Key Agent, notepad++, 7zip
@@ -303,15 +306,44 @@ cinst openvpn
 choco install winscp 
 choco install putty.install 
 choco install zoom 
-choco install logmein.client
-
-cinst notepadplusplus
+#choco install logmein.client
 
 choco install sharex
 
 choco install 7zip
 
 # choco install autohotkey  # FAILS
+
+
+choco install git -params '"/GitAndUnixToolsOnPath /WindowsTerminal /NoShellIntegration /SChannel"'
+
+choco install dotnetcore-sdk `
+  adoptopenjdk11 `
+  adoptopenjdk8 `
+  gpg4win `
+  gsudo `
+  hub `
+  rapidee `
+  slack `
+  keybase `
+  gh `
+  hub `
+  7zip `
+  vscode `
+  docker-desktop `
+  docker-compose `
+  googlechrome `
+  firefox `
+  nodejs `
+  putty `
+  maven `
+#	jetbrainstoolbox `
+#  bitnami-xampp `
+#  apache-httpd `
+
+
+RefreshEnv
+
 
 
 'DONE: Software installed.'
