@@ -97,7 +97,10 @@ Disable-MicrosoftUpdate
 #######################
 # Timezone, Hostname & Domain
 
-if (-not $TzHostDomainDone) {
+refreshenv
+'Timezone/Host/Domain already done: $env:TzHostDomainDone'
+
+if (-not $env:TzHostDomainDone) {
 
   $OrigTimezone = $(Get-Timezone).Id
 	$TimeZone = Read-Host "Time zone ($OrigTimezone)"
@@ -144,7 +147,7 @@ if (-not $TzHostDomainDone) {
 
   [System.Management.Automation.PSCredential]$WSLCredential = $(Get-Credential -UserName $UserName -Message "Set your WSL Linux password")
 
-	$TzHostDomainDone = $true
+	[System.Environment]::SetEnvironmentVariable('TzHostDomainDone', $true, [System.EnvironmentVariableTarget]::Machine)
 
 	'DONE: TimeZone, Computer Name, Domain.'
 	[console]::beep(500,300) # pitch, ms
@@ -307,15 +310,16 @@ choco install sharex
 
 choco install 7zip
 
-choco install autohotkey
+# choco install autohotkey  # FAILS
 
 
 'DONE: Software installed.'
 [console]::beep(500,300) # pitch, ms
 #read-host "Press ENTER to continue or Ctrl-C to stop..."
 
+# Remove-Item env:TzHostDomainDone
 
 Enable-UAC
 Enable-MicrosoftUpdate
 
-Install-WindowsUpdate -acceptEula
+Install-WindowsUpdate -acceptEula  # Installs any current updates
