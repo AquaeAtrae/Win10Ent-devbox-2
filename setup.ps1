@@ -58,7 +58,7 @@ if (-not($ChocoInstalled -or $BoxyInstalled)) {
 	refreshenv
 
 	[console]::beep(500,300) # pitch, ms
-	read-host "Press ENTER to continue or Ctrl-C to stop..."
+	#read-host "Press ENTER to continue or Ctrl-C to stop..."
 
 }
 else
