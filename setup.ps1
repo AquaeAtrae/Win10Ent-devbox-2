@@ -420,10 +420,10 @@ if(-Not (Test-Path "F:\Data\MSSQL15.SQLEXPRESS") ){
 }
 # https://chocolatey.org/api/v2/package/sql-server-express/2019.20200409
 Write-Host "Please wait. Installation of SSMS takes several minutes."
-choco install ssms
+# choco install ssms  # HANGS IF ALREADY INSTALLED?
 # choco install dbforge-sql-cmpl-std
-choco install heidisql
-cinst mysql.workbench
+# choco install heidisql
+# cinst mysql.workbench
 
 
 
