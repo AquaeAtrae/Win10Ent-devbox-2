@@ -220,18 +220,18 @@ New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name
 
 
 'Relocate User Folders'
-$home = "F:\Users\AquaeAtrae"
-Move-LibraryDirectory "Downloads" "$home\Downloads"
-Move-LibraryDirectory "Personal" "$home\Documents"
-Move-LibraryDirectory "Desktop" "$home\Desktop"
-Move-LibraryDirectory "My Video" "$home\Videos"
-Move-LibraryDirectory "My Pictures" "$home\Pictures"
-Move-LibraryDirectory "Favorites" "$home\Favorites"
-Move-LibraryDirectory "My Music" "$home\Music"
-# Move-LibraryDirectory "{56784854-C6CB-462B-8169-88E350ACB882}" "$home\Contacts"
-# Move-LibraryDirectory "{7D1D3A04-DEBB-4115-95CF-2F29DA2920DA}" "$home\Searches"
-# Move-LibraryDirectory "{BFB9D5E0-C6A9-404C-B2B2-AE6DB6AF4968}" "$home\Links"
-# Move-LibraryDirectory "{4C5C32FF-BB9D-43B0-B5B4-2D72E54EAAA4}" "$home\Saved Games"
+$homePath = "F:\Users\AquaeAtrae"
+Move-LibraryDirectory "Downloads" "$homePath\Downloads"
+Move-LibraryDirectory "Personal" "$homePath\Documents"
+Move-LibraryDirectory "Desktop" "$homePath\Desktop"
+Move-LibraryDirectory "My Video" "$homePath\Videos"
+Move-LibraryDirectory "My Pictures" "$homePath\Pictures"
+Move-LibraryDirectory "Favorites" "$homePath\Favorites"
+Move-LibraryDirectory "My Music" "$homePath\Music"
+# Move-LibraryDirectory "{56784854-C6CB-462B-8169-88E350ACB882}" "$homePath\Contacts"
+# Move-LibraryDirectory "{7D1D3A04-DEBB-4115-95CF-2F29DA2920DA}" "$homePath\Searches"
+# Move-LibraryDirectory "{BFB9D5E0-C6A9-404C-B2B2-AE6DB6AF4968}" "$homePath\Links"
+# Move-LibraryDirectory "{4C5C32FF-BB9D-43B0-B5B4-2D72E54EAAA4}" "$homePath\Saved Games"
 
 
 
