@@ -123,12 +123,6 @@ $TzHostDomainDone = [System.Environment]::GetEnvironmentVariable("TzHostDomainDo
 
 if (-not $TzHostDomainDone) {
 
-  $WSLUserName = $UserName.ToLower() -replace "[: ]", ""  # lowercase username stripped of invalid characters
-	# -replace " [$([RegEx]::Escape([string][IO.Path]::GetInvalidFileNameChars()))]+","_"
-
-	# TO DO: alternatively, just force password change after first login?
-  [System.Management.Automation.PSCredential]$WSLCredential = $(Get-Credential -UserName $UserName -Message "Set WSL Linux username and initial password")
-
   $OrigTimezone = $(Get-Timezone).Id
 	$TimeZone = Read-Host "Time zone ($OrigTimezone)"
 	if ([string]::IsNullOrEmpty($TimeZone)) {
@@ -312,6 +306,7 @@ if (!(Get-Command "ubuntu2004.exe" -ErrorAction SilentlyContinue)) {
 
   RefreshEnv
 
+	Write-Host "Please wait. Installation of WSL takes several minutes."
   Ubuntu2004 install --root
   Ubuntu2004 config --default-user root
 	
@@ -323,8 +318,14 @@ if (!(Get-Command "ubuntu2004.exe" -ErrorAction SilentlyContinue)) {
 	Ubuntu2004 run "useradd -m -s '/usr/bin/bash' -G sudo ${UserName}"
 	
 	'Setting WSL password'
-	[console]::beep(500,300) # pitch, ms
+	[console]::beep(500,500) # pitch, ms
   #Ubuntu2004 run passwd $UserName
+	
+	$WSLUserName = $UserName.ToLower() -replace "[: ]", ""  # lowercase username stripped of invalid characters
+	# -replace " [$([RegEx]::Escape([string][IO.Path]::GetInvalidFileNameChars()))]+","_"
+
+	# TO DO: alternatively, just force password change after first login?
+  [System.Management.Automation.PSCredential]$WSLCredential = $(Get-Credential -UserName $UserName -Message "Set WSL Linux username and initial password")
 	
 	Ubuntu2004 run "printf ""%s:%s\n"" """ + $WSLCredential.GetNetworkCredential().UserName + """ """ + $WSLCredential.GetNetworkCredential().Password + """ | chpasswd"
 	
