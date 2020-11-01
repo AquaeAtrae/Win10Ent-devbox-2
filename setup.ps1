@@ -2,7 +2,7 @@
 'Installs Chocolatey, Boxstarter, and runs next script to build fresh Windows 10 machine.'
 ''
 
-# USAGE: 
+# USAGE (WITH CLICK-ONCE COMPATIBLE BROWSER LIKE IE): 
 #   START https://boxstarter.org/package/url?https://raw.githubusercontent.com/AquaeAtrae/Win10Ent-devbox-2/master/setup.ps1
 #
 # USAGE (AFTER DOWNLOADING):
@@ -210,9 +210,12 @@ powercfg -attributes SUB_SLEEP 9d7815a6-7ee4-497e-8888-515a05f02364 -ATTRIB_HIDE
 Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives -EnableShowProtectedOSFiles -EnableShowFileExtension
 Disable-GameBarTips
 Set-CornerNavigationOptions -EnableUpperRightCornerShowCharms -EnableUpperLeftCornerSwitchApps -EnableUsePowerShellOnWinX
-Set-BoxstarterTaskbarOptions -Size Small -Dock Top -Combine Always -AlwaysShowIconsOn -MultiMonitorOn -MultiMonitorMode All -MultiMonitorCombine Always
-Set-BoxstarterTaskbarOptions -Size Small -Dock Bottom -Combine Full -Lock
-Set-BoxstarterTaskbarOptions -Size Small -Dock Bottom -Combine Full -AlwaysShowIconsOn
+# Set-BoxstarterTaskbarOptions -Size Small -Dock Top -Combine Always -AlwaysShowIconsOn -MultiMonitorOn -MultiMonitorMode All -MultiMonitorCombine Always
+# Set-BoxstarterTaskbarOptions -Size Small -Dock Bottom -Combine Full -Lock
+# Set-BoxstarterTaskbarOptions -Size Small -Dock Bottom -Combine Full -AlwaysShowIconsOn
+### FAILS Set-BoxstarterTaskbarOptions : Parameter set cannot be resolved using the specified named parameters.
+
+
 New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value "1" -PropertyType DWORD -Force  # Enable long file names
 
 
