@@ -363,10 +363,12 @@ Enable-WindowsOptionalFeature -FeatureName TelnetClient -Online -All -NoRestart
 Enable-WindowsOptionalFeature -FeatureName TFTP -Online -All -NoRestart
 Enable-WindowsOptionalFeature -FeatureName SearchEngine-Client-Package -Online -All -NoRestart
 Enable-WindowsOptionalFeature -FeatureName MSRDC-Infrastructure -Online -All -NoRestart
+'MSRDC-Infrastructure'
 Enable-WindowsOptionalFeature -FeatureName WorkFolders-Client -Online -All -NoRestart
 Enable-WindowsOptionalFeature -FeatureName ServicesForNFS-ClientOnly -Online -All -NoRestart
 Enable-WindowsOptionalFeature -FeatureName ClientForNFS-Infrastructure -Online -All -NoRestart
 Enable-WindowsOptionalFeature -FeatureName NFS-Administration -Online -All -NoRestart
+'NFS-Administration'
 Enable-WindowsOptionalFeature -FeatureName Internet-Explorer-Optional-amd64 -Online -NoRestart
 Disable-WindowsOptionalFeature -FeatureName IIS-WebServerRole -Online -NoRestart
 Disable-WindowsOptionalFeature -FeatureName MediaPlayback -Online -NoRestart
@@ -374,6 +376,7 @@ Disable-WindowsOptionalFeature -FeatureName WindowsMediaPlayer -Online -NoRestar
 Disable-WindowsOptionalFeature -FeatureName MSMQ-Container -Online -NoRestart
 Disable-WindowsOptionalFeature -FeatureName MSMQ-Server -Online -NoRestart
 Disable-WindowsOptionalFeature -FeatureName HostGuardian -Online -NoRestart
+'HostGuardian'
 Enable-WindowsOptionalFeature -FeatureName NetFx3 -Online -NoRestart
 # Disable-WindowsOptionalFeature -FeatureName Microsoft-Windows-NetFx3-OC-Package -Online -NoRestart
 # Enable-WindowsOptionalFeature -FeatureName Microsoft-Windows-NetFx4-US-OC-Package -Online -All -NoRestart
@@ -387,11 +390,14 @@ choco install dotnet4.5
 choco install dotnet4.6
 choco install dotnet4.6.1
 choco install dotnet4.6.2
+'dotnet4.6.2'
 choco install dotnet4.7
 choco install dotnet4.7.1
 choco install dotnet4.7.2
 choco install dotnetfx  # 4.8
+'dotnetfx'
 choco install dotnetcore-sdk
+'dotnetcore-sdk'
 choco install netfx-4.5.1-devpack
 choco install netfx-4.5.2-devpack
 choco install netfx-4.6.1-devpack
@@ -399,6 +405,7 @@ choco install netfx-4.7-devpack
 choco install netfx-4.7.1-devpack
 choco install netfx-4.7.2-devpack
 choco install netfx-4.8-devpack
+''netfx-4.8
 
 # Install-Module -Name VcRedist -Force
 # VcRedist
