@@ -343,7 +343,7 @@ choco install vcxsrv
 # choco install xming
 
 Write-Host "Please wait. Installation of Docker Desktop takes several minutes."
-choco install docker-desktop
+choco install docker-desktop  # after rebootm leaves app running
 # enable resources | WSL integration?
 choco install docker-compose
 choco install docker-kitematic
@@ -376,7 +376,7 @@ Disable-WindowsOptionalFeature -FeatureName MSMQ-Server -Online -NoRestart
 Disable-WindowsOptionalFeature -FeatureName HostGuardian -Online -NoRestart
 Disable-WindowsOptionalFeature -FeatureName NetFx3 -Online -NoRestart
 # Disable-WindowsOptionalFeature -FeatureName Microsoft-Windows-NetFx3-OC-Package -Online -NoRestart
-Enable-WindowsOptionalFeature -FeatureName Microsoft-Windows-NetFx4-US-OC-Package -Online -All -NoRestart
+# Enable-WindowsOptionalFeature -FeatureName Microsoft-Windows-NetFx4-US-OC-Package -Online -All -NoRestart
 
 'DONE: Other Windows Features.'
 [console]::beep(500,300) # pitch, ms
