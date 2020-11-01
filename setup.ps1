@@ -405,7 +405,7 @@ choco install netfx-4.7-devpack
 choco install netfx-4.7.1-devpack
 choco install netfx-4.7.2-devpack
 choco install netfx-4.8-devpack
-''netfx-4.8
+'netfx-4.8'
 
 # Install-Module -Name VcRedist -Force
 # VcRedist
