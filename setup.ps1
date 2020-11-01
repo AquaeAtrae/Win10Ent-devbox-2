@@ -1,6 +1,6 @@
-'RUNNING: setup.ps1   v20201101a'
-'Installs Chocolatey, Boxstarter, and runs next script to build fresh Windows 10 machine.'
-''
+Write-Host "RUNNING: setup.ps1   v20201101a"
+Write-Host "Installs Chocolatey, Boxstarter, and runs next script to build fresh Windows 10 machine."
+Write-Host ""
 
 # USAGE (WITH CLICK-ONCE COMPATIBLE BROWSER LIKE IE): 
 #   START https://boxstarter.org/package/url?https://raw.githubusercontent.com/AquaeAtrae/Win10Ent-devbox-2/master/setup.ps1
@@ -403,8 +403,8 @@ choco install netfx-4.5.2-devpack
 choco install netfx-4.6.1-devpack
 choco install netfx-4.7-devpack
 choco install netfx-4.7.1-devpack
-# choco install netfx-4.7.2-devpack --force  # HANGS IF ALREADY INSTALLED?
-# choco install netfx-4.8-devpack
+# choco install netfx-4.7.2-devpack  # HANGS IF ALREADY INSTALLED?
+# choco install netfx-4.8-devpack  # HANGS IF ALREADY INSTALLED?
 
 Write-Host "DONE: DotNet framework and devpacks"
 
