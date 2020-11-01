@@ -403,7 +403,7 @@ choco install netfx-4.5.2-devpack
 choco install netfx-4.6.1-devpack
 choco install netfx-4.7-devpack
 choco install netfx-4.7.1-devpack
-choco install netfx-4.7.2-devpack
+choco install netfx-4.7.2-devpack --force  # HANGS IF ALREADY INSTALLED?
 choco install netfx-4.8-devpack
 'netfx-4.8'
 
