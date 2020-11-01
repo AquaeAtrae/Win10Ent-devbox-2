@@ -274,16 +274,11 @@ Enable-WindowsOptionalFeature -FeatureName Containers -Online -All -NoRestart
 Enable-WindowsOptionalFeature -FeatureName Containers-DisposableClientVM -Online -All -NoRestart
 $winVer = [int](Get-Item "HKLM:SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue('ReleaseID')
 if ($winVer -ge 2004) {
-  $features.enable += @('VirtualMachinePlatform')
+	Enable-WindowsOptionalFeature -FeatureName VirtualMachinePlatform -Online -All -NoRestart
 }
 
-
-
-
-
 # Enable long file names (beyond 260 chars)
-# [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem]
-#"LongPathsEnabled"=dword:00000001
+New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value "1" -PropertyType DWORD -Force
 
 
 #######################
