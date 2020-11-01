@@ -404,8 +404,9 @@ choco install netfx-4.6.1-devpack
 choco install netfx-4.7-devpack
 choco install netfx-4.7.1-devpack
 # choco install netfx-4.7.2-devpack --force  # HANGS IF ALREADY INSTALLED?
-choco install netfx-4.8-devpack
-'netfx-4.8'
+# choco install netfx-4.8-devpack
+
+Write-Host "DONE: DotNet framework and devpacks"
 
 # Install-Module -Name VcRedist -Force
 # VcRedist
