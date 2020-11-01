@@ -415,8 +415,8 @@ Write-Host "DONE: DotNet framework and devpacks"
 #######################
 
 Write-Host "Please wait. Installation of SQL Server takes several minutes."
-if(!Test-Path "F:\Data\MSSQL15.SQLEXPRESS"){
-	choco install sql-server-express -ia '/INSTALLSQLDATADIR=""F:\Data\MSSQL15.SQLEXPRESS""'  # must not contain old master.mdf
+if(-Not (Test-Path "F:\Data\MSSQL15.SQLEXPRESS") ){
+	choco install sql-server-express -ia '/INSTALLSQLDATADIR=""F:\Data\MSSQL15.SQLEXPRESS""'  # fails to skip if already installed, must not contain old master.mdf
 }
 # https://chocolatey.org/api/v2/package/sql-server-express/2019.20200409
 Write-Host "Please wait. Installation of SSMS takes several minutes."
