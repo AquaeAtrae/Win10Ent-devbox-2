@@ -1,6 +1,18 @@
 'RUNNING: setup.ps1'
 'Installs Chocolatey, Boxstarter, and runs next script to build fresh Windows 10 machine.'
 ''
+
+# USAGE: 
+#   START https://boxstarter.org/package/url?https://raw.githubusercontent.com/AquaeAtrae/Win10Ent-devbox-2/master/setup.ps1
+#
+# USAGE (AFTER DOWNLOADING):
+#   PowerShell.exe -ExecutionPolicy Bypass -File .\setup.ps1
+#
+# USAGE: 
+#   PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/AquaeAtrae/Win10Ent-devbox-2/master/setup.ps1'))"
+
+
+
 # Uninterupted Operating System
 # by AquaeAtrae 8/30/2020
 
