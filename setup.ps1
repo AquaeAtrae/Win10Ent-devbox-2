@@ -236,7 +236,18 @@ Move-LibraryDirectory "My Music" "$homePath\Music"
 
 
 Install-Script -Name driverharvest
-driverharvest   # create baseline list, run again later to collect added drivers
+# driverharvest   # create baseline list, run again later to collect added drivers
+
+'NEXT: Drivers (run driverharvest first for baseline?)'
+[console]::beep(500,300) # pitch, ms
+# read-host "Press ENTER to continue or Ctrl-C to stop..."
+$secondsRunning = 0;
+Write-Output "Press any key to abort the following wait time."
+while( (-not $Host.UI.RawUI.KeyAvailable) -and ($secondsRunning -lt 20) ){
+    Write-Host ("Waiting for: " + (20-$secondsRunning))
+    Start-Sleep -Seconds 1
+    $secondsRunning++
+}
 
 Install-Script -Name Get-DriversPackFromDell
 # .\Get-DriversPackFromDell.ps1 -models 'Alienware R13'
