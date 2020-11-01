@@ -349,7 +349,7 @@ choco install docker-compose
 choco install docker-kitematic
 choco install virtualbox
 choco install VirtualBox.ExtensionPack  # FAILS
-choco install virtualbox-guest-additions-guest.install  # FAILS
+# choco install virtualbox-guest-additions-guest.install  # FAILS
 
 
 'DONE: Virtualization and WSL2.'
@@ -400,14 +400,16 @@ choco install netfx-4.7.1-devpack
 choco install netfx-4.7.2-devpack
 choco install netfx-4.8-devpack
 
-Install-Module -Name VcRedist -Force
+# Install-Module -Name VcRedist -Force
 # VcRedist
 
 
 #######################
 
-choco install sql-server-express -ia '/INSTALLSQLDATADIR=""F:\Data\MSSQL15.SQLEXPRESS""'
+Write-Host "Please wait. Installation of SQL Server takes several minutes."
+choco install sql-server-express -ia '/INSTALLSQLDATADIR=""F:\Data\MSSQL15.SQLEXPRESS""'  # must not contain old master.mdf
 # https://chocolatey.org/api/v2/package/sql-server-express/2019.20200409
+Write-Host "Please wait. Installation of SSMS takes several minutes."
 choco install ssms
 # choco install dbforge-sql-cmpl-std
 choco install heidisql
@@ -651,10 +653,26 @@ Install-WindowsUpdate -acceptEula  # Installs any current updates
 
 
 
-#######################
+
+
+<#######################
 # REMINDERS
 
-# ManicTime Server
-# OLT Photoshop Macros.atn
-# G Hub macros
-# Lightroom Catalogs
+KeepassCX
+
+Setup ManicTime Server
+
+Office Pro Plus install MAK
+Adobe CC installs
+Lightroom Catalogs
+Lightroom extensions
+Lightroom export pre-sets
+OLT Photoshop Macros.atn
+
+Docker Desktop
+- disable auto start on login
+- enable WSL
+
+G Hub macros
+
+#>
