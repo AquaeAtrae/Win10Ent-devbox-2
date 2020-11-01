@@ -374,7 +374,7 @@ Disable-WindowsOptionalFeature -FeatureName WindowsMediaPlayer -Online -NoRestar
 Disable-WindowsOptionalFeature -FeatureName MSMQ-Container -Online -NoRestart
 Disable-WindowsOptionalFeature -FeatureName MSMQ-Server -Online -NoRestart
 Disable-WindowsOptionalFeature -FeatureName HostGuardian -Online -NoRestart
-Disable-WindowsOptionalFeature -FeatureName NetFx3 -Online -NoRestart
+Enable-WindowsOptionalFeature -FeatureName NetFx3 -Online -NoRestart
 # Disable-WindowsOptionalFeature -FeatureName Microsoft-Windows-NetFx3-OC-Package -Online -NoRestart
 # Enable-WindowsOptionalFeature -FeatureName Microsoft-Windows-NetFx4-US-OC-Package -Online -All -NoRestart
 
