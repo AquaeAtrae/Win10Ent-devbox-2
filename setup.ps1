@@ -37,10 +37,8 @@ $LocalCredential = [System.Security.Principal.WindowsIdentity]::GetCurrent().Nam
 # Chocolatey, Boxstarter, and prerequisites
 
 $ChocoInstalled = $false; if (Get-Command choco.exe -ErrorAction SilentlyContinue) { $ChocoInstalled = $true }
-$BoxyInstalled = $false; if (Get-Command BoxStarter.bat -ErrorAction SilentlyContinue) { $BoxyInstalled = $true }
-
-if (-not($ChocoInstalled -or $BoxyInstalled)) {
-	'Chocolatey or BoxStarter not yet installed.'
+if (-not($ChocoInstalled)) {
+	'Chocolatey not yet installed.'
 
 	# $Env:ChocolateyInstall = "%PROGRAMDATA%\Chocolatey"
 	[System.Environment]::SetEnvironmentVariable("ChocolateyInstall", $null, 'User')
@@ -56,6 +54,12 @@ if (-not($ChocoInstalled -or $BoxyInstalled)) {
 	& "$Env:ProgramData\chocolatey\choco.exe" upgrade chocolatey --yes --force
 	'Chocolatey installed and upgraded.'
 
+}
+
+$BoxyInstalled = $false; if (Get-Command BoxStarter.bat -ErrorAction SilentlyContinue) { $BoxyInstalled = $true }
+if (-not($BoxyInstalled)) {
+	'BoxStarter not yet installed.'
+
 	'Installing Boxstarter.'
 	& "$Env:ProgramData\chocolatey\choco.exe" install Boxstarter --yes --force 
 
@@ -67,10 +71,6 @@ if (-not($ChocoInstalled -or $BoxyInstalled)) {
 	[console]::beep(500,300) # pitch, ms
 	#read-host "Press ENTER to continue or Ctrl-C to stop..."
 
-}
-else
-{
-	'Chocolatey and Boxstarter already installed...'
 }
 
 #######################
@@ -182,60 +182,27 @@ Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
 'DONE: Remote access enabled.'
 [console]::beep(500,300) # pitch, ms
 
-function Assign-DriveLetter {
-    param(
-       [Parameter(Position=0,Mandatory)]
-       [string]$DesiredDriveLetter,
+'Power Settings'
+powercfg -change -standby-timeout-ac 0
+powercfg -change -standby-timeout-dc 0
+powercfg -change -monitor-timeout-ac 20
+powercfg -change -monitor-timeout-dc 20
+powercfg -change -disk-timeout-ac 20
+powercfg -change -disk-timeout-dc 20
+powercfg -setacvalueindex 381b4222-f694-41f0-9685-ff5bb260df2e 4f971e89-eebd-4455-a8de-9e59040e7347 5ca83367-6e45-459f-a27b-476b1d01c936 0
+powercfg -setdcvalueindex 381b4222-f694-41f0-9685-ff5bb260df2e 4f971e89-eebd-4455-a8de-9e59040e7347 5ca83367-6e45-459f-a27b-476b1d01c936 0
+powercfg -attributes SUB_SLEEP 9d7815a6-7ee4-497e-8888-515a05f02364 -ATTRIB_HIDE;  powercfg -h on     # not compatible with HostGuardian
 
-       [Parameter(Position=1)]
-       [string]$DriveID,
 
-       [Parameter(Position=2)]
-       [string]$DriveSerial,
+# Set-StartScreenOptions -EnableBootToDesktop -EnableDesktopBackgroundOnStart -EnableShowStartOnActiveScreen -EnableListDesktopAppsFirst
+Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives -EnableShowProtectedOSFiles -EnableShowFileExtension
+Disable-GameBarTips
+Set-CornerNavigationOptions -EnableUpperRightCornerShowCharms -EnableUpperLeftCornerSwitchApps -EnableUsePowerShellOnWinX
+Set-BoxstarterTaskbarOptions -Size Small -Dock Top -Combine Always -AlwaysShowIconsOn -MultiMonitorOn -MultiMonitorMode All -MultiMonitorCombine Always
+Set-BoxstarterTaskbarOptions -Size Small -Dock Bottom -Combine Full -Lock
+Set-BoxstarterTaskbarOptions -Size Small -Dock Bottom -Combine Full -AlwaysShowIconsOn
+New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value "1" -PropertyType DWORD -Force  # Enable long file names
 
-       [Parameter(Position=3)]
-       [string]$DriveLabel
-       )
-
-    if (!$DriveID) {  if (!$DriveSerial) {  if (!$DriveLabel) {
-        $Drive = gwmi Win32_Volume | where {$_.Label -like $DriveLabel} | select -First 1
-    } else {
-        $Drive = gwmi Win32_Volume | where {$_.SerialNumber -like $DriveSerial} | select -First 1
-    } else {
-        $Drive = gwmi Win32_Volume | where {$_.DeviceID -like $DriveID} | select -First 1
-    } else {
-        'ERROR: Must identify the drive to assign letter via DriveID, DriveSerial, or DriveLabel'
-    }
-
-    if ($DesiredDriveLetter + ":" -ne $Drive.DriveLetter) {
-        $takenDriveLetters = (Get-PSDrive).Name -like '?'
-        if ($DesiredDriveLetter -in $takenDriveLetters) {
-            # Reassign existing drive to first unused drive letter to release the drive letter
-            $firstUnusedDriveLetter = [char[]] (0x44..0x5a) | where { $_ -notin $takenDriveLetters } | select -first 1  # ASCII letters D through Z
-            
-            Write-Host "Moving existing drive from $DesiredDriveLetter`: to $firstUnusedDriveLetter`:"
-            $ExistingDrive = gwmi Win32_Volume | where {$_.DriveLetter -like $DesiredDriveLetter + ":"}
-
-            if (!$ExistingDrive) {'Boxstarter reboot required'; Invoke-Reboot}  # boxstarter reboot
-            $ExistingDrive.AddMountPoint($firstUnusedDriveLetter + ":\")
-            $ExistingDrive.DriveLetter = $firstUnusedDriveLetter + ":"
-            $ExistingDrive.Put()
-            $ExistingDrive.Mount()
-        }
-
-        if ((Get-PSDrive).Name -like $DesiredDriveLette) {'Boxstarter reboot required'; Invoke-Reboot}  # boxstarter reboot
-
-        Write-Host "Assigning drive to $DesiredDriveLetter`:"
-        $Drive.AddMountPoint($DesiredDriveLetter + ":\")
-        $Drive.DriveLetter = $DesiredDriveLetter + ":"
-        $Drive.Put()
-        $Drive.Mount()
-    }
-}
-
-'Setting drive letter assignments'
-Assign-DriveLetter -DesiredDriveLetter "D" -DriveLabel "Data"
-Assign-DriveLetter -DesiredDriveLetter "F" -DriveLabel "Files"
 
 'Relocate User Folders'
 $home = "F:\Users\AquaeAtrae"
@@ -251,26 +218,22 @@ Move-LibraryDirectory "My Music" "$home\Music"
 # Move-LibraryDirectory "{BFB9D5E0-C6A9-404C-B2B2-AE6DB6AF4968}" "$home\Links"
 # Move-LibraryDirectory "{4C5C32FF-BB9D-43B0-B5B4-2D72E54EAAA4}" "$home\Saved Games"
 
-'Power Settings'
-powercfg -change -standby-timeout-ac 0
-powercfg -change -standby-timeout-dc 0
-powercfg -change -monitor-timeout-ac 20
-powercfg -change -monitor-timeout-dc 20
-powercfg -change -disk-timeout-ac 20
-powercfg -change -disk-timeout-dc 20
-powercfg -setacvalueindex 381b4222-f694-41f0-9685-ff5bb260df2e 4f971e89-eebd-4455-a8de-9e59040e7347 5ca83367-6e45-459f-a27b-476b1d01c936 0
-powercfg -setdcvalueindex 381b4222-f694-41f0-9685-ff5bb260df2e 4f971e89-eebd-4455-a8de-9e59040e7347 5ca83367-6e45-459f-a27b-476b1d01c936 0
-powercfg -attributes SUB_SLEEP 9d7815a6-7ee4-497e-8888-515a05f02364 -ATTRIB_HIDE;  powercfg -h on     # not compatible with HostGuardian
-# Set-StartScreenOptions -EnableBootToDesktop -EnableDesktopBackgroundOnStart -EnableShowStartOnActiveScreen -EnableListDesktopAppsFirst
-Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives -EnableShowProtectedOSFiles -EnableShowFileExtension
-Set-TaskbarOptions -Size Small -Dock Bottom -Combine Full -Lock
-Set-TaskbarOptions -Size Small -Dock Bottom -Combine Full -AlwaysShowIconsOn
 
 
-$winVer = [int](Get-Item "HKLM:SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue('ReleaseID')
-if ($winVer -ge 2004) {
-  $features.enable += @('VirtualMachinePlatform')
-}
+Install-Script -Name driverharvest
+driverharvest   # create baseline list, run again later to collect added drivers
+
+Install-Script -Name Get-DriversPackFromDell
+# .\Get-DriversPackFromDell.ps1 -models 'Alienware R13'
+
+choco install dellcommandupdate
+choco install dell-update
+choco install nvidia-display-driver
+choco install geforce-experience
+# choco install msiafterburner
+choco install samsung-magician
+choco install logitech-options
+
 
 Enable-WindowsOptionalFeature -FeatureName Microsoft-Hyper-V-All -Online -All -NoRestart
 Enable-WindowsOptionalFeature -FeatureName Microsoft-Hyper-V -Online -All -NoRestart
@@ -283,33 +246,20 @@ Enable-WindowsOptionalFeature -FeatureName HypervisorPlatform -Online -All -NoRe
 Enable-WindowsOptionalFeature -FeatureName Microsoft-Windows-Subsystem-Linux -Online -All -NoRestart
 Enable-WindowsOptionalFeature -FeatureName Containers -Online -All -NoRestart
 Enable-WindowsOptionalFeature -FeatureName Containers-DisposableClientVM -Online -All -NoRestart
-Enable-WindowsOptionalFeature -FeatureName Windows-Defender-ApplicationGuard -Online -All -NoRestart
-Enable-WindowsOptionalFeature -FeatureName TelnetClient -Online -All -NoRestart
-Enable-WindowsOptionalFeature -FeatureName TFTP -Online -All -NoRestart
-Enable-WindowsOptionalFeature -FeatureName SearchEngine-Client-Package -Online -All -NoRestart
-Enable-WindowsOptionalFeature -FeatureName MSRDC-Infrastructure -Online -All -NoRestart
-Enable-WindowsOptionalFeature -FeatureName WorkFolders-Client -Online -All -NoRestart
-Enable-WindowsOptionalFeature -FeatureName ServicesForNFS-ClientOnly -Online -All -NoRestart
-Enable-WindowsOptionalFeature -FeatureName ClientForNFS-Infrastructure -Online -All -NoRestart
-Enable-WindowsOptionalFeature -FeatureName NFS-Administration -Online -All -NoRestart
-Disable-WindowsOptionalFeature -FeatureName Internet-Explorer-Optional-amd64 -Online -NoRestart
-Disable-WindowsOptionalFeature -FeatureName IIS-WebServerRole -Online -NoRestart
-Disable-WindowsOptionalFeature -FeatureName MediaPlayback -Online -NoRestart
-Disable-WindowsOptionalFeature -FeatureName WindowsMediaPlayer -Online -NoRestart
-Disable-WindowsOptionalFeature -FeatureName MSMQ-Container -Online -NoRestart
-Disable-WindowsOptionalFeature -FeatureName MSMQ-Server -Online -NoRestart
-Disable-WindowsOptionalFeature -FeatureName HostGuardian -Online -NoRestart
-Disable-WindowsOptionalFeature -FeatureName NetFx3 -Online -NoRestart
-Disable-WindowsOptionalFeature -FeatureName Microsoft-Windows-NetFx3-OC-Package -Online -NoRestart
-Enable-WindowsOptionalFeature -FeatureName Microsoft-Windows-NetFx4-US-OC-Package -Online -All -NoRestart
+$winVer = [int](Get-Item "HKLM:SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue('ReleaseID')
+if ($winVer -ge 2004) {
+  $features.enable += @('VirtualMachinePlatform')
+}
+
+
+
 
 
 # Enable long file names (beyond 260 chars)
 # [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem]
 #"LongPathsEnabled"=dword:00000001
 
-'DONE: Windows 10 Features enabled'
-''
+
 #######################
 # WSL2
 
@@ -370,25 +320,45 @@ if (!(Get-Command "ubuntu2004.exe" -ErrorAction SilentlyContinue)) {
 choco install vcxsrv
 # choco install xming
 
-'DONE: WSL2 installed.'
+
+choco install docker-desktop
+# enable resources | WSL integration?
+choco install docker-compose
+choco install docker-kitematic
+choco install virtualbox
+choco install VirtualBox.ExtensionPack
+choco install virtualbox-guest-additions-guest.install
+
+
+'DONE: Virtualization and WSL2.'
 [console]::beep(500,300) # pitch, ms
 #read-host "Press ENTER to continue or Ctrl-C to stop..."
 
 
-#######################
-# Profile
 
-# OLT Photoshop Macros.atn
-# G Hub macros
-# Lightroom Catalogs
+Enable-WindowsOptionalFeature -FeatureName Windows-Defender-ApplicationGuard -Online -All -NoRestart
+Enable-WindowsOptionalFeature -FeatureName TelnetClient -Online -All -NoRestart
+Enable-WindowsOptionalFeature -FeatureName TFTP -Online -All -NoRestart
+Enable-WindowsOptionalFeature -FeatureName SearchEngine-Client-Package -Online -All -NoRestart
+Enable-WindowsOptionalFeature -FeatureName MSRDC-Infrastructure -Online -All -NoRestart
+Enable-WindowsOptionalFeature -FeatureName WorkFolders-Client -Online -All -NoRestart
+Enable-WindowsOptionalFeature -FeatureName ServicesForNFS-ClientOnly -Online -All -NoRestart
+Enable-WindowsOptionalFeature -FeatureName ClientForNFS-Infrastructure -Online -All -NoRestart
+Enable-WindowsOptionalFeature -FeatureName NFS-Administration -Online -All -NoRestart
+Disable-WindowsOptionalFeature -FeatureName Internet-Explorer-Optional-amd64 -Online -NoRestart
+Disable-WindowsOptionalFeature -FeatureName IIS-WebServerRole -Online -NoRestart
+Disable-WindowsOptionalFeature -FeatureName MediaPlayback -Online -NoRestart
+Disable-WindowsOptionalFeature -FeatureName WindowsMediaPlayer -Online -NoRestart
+Disable-WindowsOptionalFeature -FeatureName MSMQ-Container -Online -NoRestart
+Disable-WindowsOptionalFeature -FeatureName MSMQ-Server -Online -NoRestart
+Disable-WindowsOptionalFeature -FeatureName HostGuardian -Online -NoRestart
+Disable-WindowsOptionalFeature -FeatureName NetFx3 -Online -NoRestart
+Disable-WindowsOptionalFeature -FeatureName Microsoft-Windows-NetFx3-OC-Package -Online -NoRestart
+Enable-WindowsOptionalFeature -FeatureName Microsoft-Windows-NetFx4-US-OC-Package -Online -All -NoRestart
 
-
-#######################
-# Installing software
-
-'Installing software...'
-
-# choco install webpi
+'DONE: Other Windows Features.'
+[console]::beep(500,300) # pitch, ms
+#read-host "Press ENTER to continue or Ctrl-C to stop..."
 
 # .NET
 choco install dotnet4.5
@@ -408,197 +378,222 @@ choco install netfx-4.7-devpack
 choco install netfx-4.7.2-devpack
 choco install netfx-4.8-devpack
 
-choco install manictime  # requires dotnet 4.5
+Install-Module -Name VcRedist
+# VcRedist
 
-# %USERPROFILE%\.docker\daemon.json   # "data-root": "",
-choco install docker-desktop
-# enable resources | WSL integration?
-# choco install jq
 
-choco install docker-compose
-choco install docker-kitematic
-
-# choco install virtualbox
-# choco install virtualbox-guest-additions-guest.install
-
-choco install windows-adk-all   # WinPE builder
-
-choco install powershell-core
-choco install microsoft-windows-terminal
-# https://aka.ms/terminal-documentation
-
-choco install notepadplusplus
-
-choco install chocolateygui
-choco install boxstarter.hyperv
-choco install cloneapp	# backup and recover app configs and registries
-# cloneapp-ua 
-
-choco install autoit.install
-# choco install sudo
-choco install gsudo
+#######################
 
 choco install sql-server-express -ia '/INSTALLSQLDATADIR=""F:\Data\MSSQL15.SQLEXPRESS""'
 # https://chocolatey.org/api/v2/package/sql-server-express/2019.20200409
 choco install ssms
+# choco install dbforge-sql-cmpl-std
+choco install heidisql
+cinst mysql.workbench
 
+
+
+choco install powershell-core
+# choco install sudo
+choco install gsudo
+choco install manictime
+
+choco install chocolateygui
+choco install boxstarter.hyperv
+choco install autoit.install
+choco install autohotkey
+choco install nirlauncher  # including ProduKey and MyUninstaller which lists all apps
+Install-Module -Name PackageManagement  # OneGet is included with Windows 10
+Install-Module -Name PSLogging
+Install-Module -Name PSSoftware
+Get-PackageProvider -name chocolatey  # https://www.hanselman.com/blog/AptGetForWindowsOneGetAndChocolateyOnWindows10.aspx
+Install-Module -Name ReverseDSC
+Install-Module -Name ComputerManagementDsc -AllowPrerelease
+
+
+
+choco install microsoft-windows-terminal
+# https://aka.ms/terminal-documentation
+choco install notepadplusplus
+choco install jq  # cli json processor
+choco install postman  # API testing tool
+choco install git -params '"/GitAndUnixToolsOnPath /WindowsTerminal /NoShellIntegration /SChannel"'
+# choco install logrotate
 # choco install vscode
 choco install vscodium
 choco pin add -n=vscodium
+code --install-extension ms-vscode.csharp
+code --install-extension formulahendry.code-runner
+code --install-extension streetsidesoftware.code-spell-checker
+code --install-extension msjsdiag.debugger-for-chrome
+code --install-extension PeterJausovec.vscode-docker
+code --install-extension dbaeumer.vscode-eslint
+code --install-extension abusaidm.html-snippets
+code --install-extension eg2.vscode-npm-script
+code --install-extension ms-vscode.powershell
+code --install-extension Ionide.ionide-fsharp
+code --install-extension Shan.code-settings-sync
+code --install-extension Ionide.ionide-fake
+code --install-extension Ionide.ionide-paket
+code --install-extension esbenp.prettier-vscode
+code --install-extension eamodio.gitlens
+code --install-extension robertohuertasm.vscode-icons
 choco install arduino
 choco install firacode
+cinst mactype
 choco install mkcert
 choco install bugshooting
-# Windows Steps Recorder is built-in
-
-# choco install intellijidea-community  # jetbrains java IDE
+#     Windows Steps Recorder is built-in
 # choco install phpstorm
 # choco install webstorm
+choco install scriptcs
+choco install linqpad
+choco install fiddler
 # choco install kubernetes-cli
+choco install winmerge
+choco install nimbletext
 
-choco install winmerge	
-# choco install sublimetext2
-# atom
-	
+choco install sublimetext3
+choco install sublimetext3.packagecontrol
+# choco install atom
 # choco install nxlog
-
-choco install everything  # search files and folders
+cinst logparser
+cinst logparser.lizardgui
+choco install baretail
+choco install nuget.commandline --pre 
+choco install nugetpackageexplorer
 choco install sysinternals
+
 choco install handle  # shows which process has files open
 choco install powertoys
 choco install autoruns
 choco install linkshellextension
 choco install rufus
-choco install nirlauncher  # includes Win32/Unwaders adware?!
-choco install nircmd
-
 choco install crystaldiskinfo
 choco install crystaldiskmark
 choco install hwinfo.install
 choco install gpu-z
 choco install cpu-z
 choco install hwmonitor
-
 choco install windowsrepair  # tweaking.com
-
+choco install rapidee
 choco install gpg4win
+choco install everything  # search files and folders
+choco install listary
 choco install treesizefree
-
-
-#######################
-# NextCloud, Google Drive, KeePass, Authy, Putty, winscp, OpenVPN, SSH Key Agent, notepad++, 7zip
-
-choco install googledrive 
-choco install google-drive-file-stream
+cinst googledrive
+cinst google-drive-file-stream
 choco install google-backup-and-sync
 # choco install dropbox
 choco install nextcloud-client
 # choco install syncthing
 # choco install rsync
-
-choco install keepassxc
-choco install keepass-keepasshttp
-choco install authy-desktop
-# choco install lastpass
-choco install openvpn
-# choco install nordvpn  # FAILS
-choco install veracrypt
-
-choco install openvpn
-
-choco install winscp 
+choco install putty
+choco install winscp
 choco install curl
 choco install wget
-choco install putty
+#
+choco install reflect-free
 # choco install utorrent
-choco install jq  # cli json processor
-choco install postman  # API testing tool
 choco install teracopy
+choco install xyplorer
 choco install grepwin
-# choco install logrotate
 
+choco install 7zip
+Install-Module -Name 7Zip4Powershell; Import-Module -Name 7Zip4Powershell -Global
 # choco install wireshark
 # choco install winpcap
 # choco install nmap
 # choco install advanced-ip-scanner
-# choco install zap  # OWASP Zap proxy tester
-
-choco install zoom 
 # choco install logmein.client
 # choco install teamviewer-qs
-
-choco install sharex
-
-choco install 7zip
-Install-Module -Name 7Zip4Powershell
-Import-Module -Name 7Zip4Powershell -Global
-
-choco install autohotkey
-# choco install autohotkey.install
-
-choco install git -params '"/GitAndUnixToolsOnPath /WindowsTerminal /NoShellIntegration /SChannel"'
-
 # choco install javaruntime-preventasktoolbar
-choco adoptopenjdk11 `
-  adoptopenjdk8 `
+adoptopenjdk8
+adoptopenjdk11
+#  choco install bitnami-xampp
+#  choco install apache-httpd
+# choco install zap
+choco install keybase  # requires dotnet4.7
+choco install googlechrome
+$chrome = convert-path (ls "$env:localappdata\" -recurse -include "chrome.exe")[0].pspath;  If ($chrome -ne "")        {        Install-ChocolateyPinnedTaskBarItem $chrome }
 
-choco install hub `
-  rapidee `
-  slack `
-  keybase `  # requires dotnet4.7
-  gh `
-  hub `
-  googlechrome `
-  firefox `  # FAILS
-  nodejs `
-  maven `
-#  jetbrainstoolbox `
-#  bitnami-xampp `
-#  apache-httpd `
-
-
+choco install firefox  # FAILS
 choco install microsoft-edge
+choco install nodejs
+choco install maven
+# choco install intellijidea-community
+# choco install jetbrainstoolbox
+choco install dotpeek
+choco install resharper-ultimate-all --pre 
+choco install stylecop
+choco install gh
+choco install github-desktop
+choco install hub
+choco install slack
 
-
-choco install microsoft-office-deployment --params="'/64bit /Product:ProPlus2019Volume /Exclude:OneDrive,Outlook,Lync,Groove'"  # Office Volume license requires MLK key
-# choco install office365proplus
 # choco install libreoffice-fresh
 # choco install openoffice
 # choco install crystalreports2008runtime
 # choco install evernote
-# choco install adobe-creative-cloud  # FAILS error code 72
+
+choco install zoom
+choco install ditto
+choco install sharex
+choco install fscapture
 
 # choco install qgis
-# choco install googleearthpro
-
+choco install googleearthpro
 # choco install inkscape
-# choco install gimp
-# choco install drawio  # diagrams
+
+choco install gimp
+choco install drawio  # diagrams
+choco install pencil
+choco install balsamiqmockups3
+
 # choco install audacity
 # choco install audacity-lame  # mp3 encoder
 # choco install shotcut  # video editor
 # choco install openshot  # video editor
 # choco install avidemux
 # choco install carnac  # shows keystrokes for demos
-# choco install blender
+choco install blender
 # choco install handbrake.install
+
 # choco install meshroom  # photoscanning
+choco install discord.install
+choco install steam
+choco install origin
+choco install uplay
 
-# choco install discord.install
-# choco install steam
-# choco install origin
-# choco install uplay
-
-choco install dellcommandupdate
-choco install dell-update
-choco install nvidia-display-driver
-# choco install geforce-experience  # FAILS
-# choco install msiafterburner
-choco install samsung-magician
-# choco install logitech-options
 # choco install ccleaner
 # choco install ccenhancer
 # choco install bulk-crap-uninstaller
+
+cinst keepassxc
+choco install keepass-keepasshttp
+cinst authy-desktop
+# choco install lastpass
+choco install openvpn
+
+# choco install nordvpn  # FAILS
+choco install veracrypt
+
+
+# choco install microsoft-office-deployment --params="'/64bit /Product:ProPlus2019Volume /Exclude:OneDrive,Outlook,Lync,Groove'"  # Office Volume license requires MLK key
+choco install office365proplus
+
+choco install adobe-creative-cloud
+# https://helpx.adobe.com/download-install/kb/creative-cloud-desktop-app-download.html
+# https://prodesigntools.com/creative-cloud-2020-direct-download-links.html
+
+# Adobe Photoshop Actions, etc	
+# Adobe Lightroom Classic	
+# jf Metadata Wrangler	
+# LR/Transporter	
+# jf CaptureTime to Exif	
+# jf Data Explorer	
+# jf MegaPixel Sort	
+# FOLLOWUP: Lightroom Classic Export	https://docs.google.com/document/d/1-xH1W5XixtMQRXMpSZ4zvf7z0URzTiv4z58VMR63BOU/edit
 
 RefreshEnv
 
@@ -611,7 +606,16 @@ If ($chrome -ne "")	{	Install-ChocolateyPinnedTaskBarItem $chrome }
 [console]::beep(500,300) # pitch, ms
 #read-host "Press ENTER to continue or Ctrl-C to stop..."
 
+#  cloneapp-ua
+choco install cloneapp
+# cloneapp productkey
+
 # 	[System.Environment]::SetEnvironmentVariable('TzHostDomainDone', $null, [System.EnvironmentVariableTarget]::Machine)  # clear variable
+
+# choco install kis
+
+Set-MpPreference -EnableControlledFolderAccess Enabled
+
 
 choco install choco-package-list-backup
 # https://www.alexdresko.com/2014/12/22/automatically-generating-a-chocolatey-install-script/
@@ -622,3 +626,13 @@ Enable-UAC
 Enable-MicrosoftUpdate
 
 Install-WindowsUpdate -acceptEula  # Installs any current updates
+
+
+
+#######################
+# REMINDERS
+
+# ManicTime Server
+# OLT Photoshop Macros.atn
+# G Hub macros
+# Lightroom Catalogs
