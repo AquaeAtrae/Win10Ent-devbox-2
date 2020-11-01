@@ -396,11 +396,11 @@ choco install netfx-4.5.1-devpack
 choco install netfx-4.5.2-devpack
 choco install netfx-4.6.1-devpack
 choco install netfx-4.7-devpack
-#choco install netfx-4.7.1-devpack  # FAILS
+choco install netfx-4.7.1-devpack
 choco install netfx-4.7.2-devpack
 choco install netfx-4.8-devpack
 
-Install-Module -Name VcRedist
+Install-Module -Name VcRedist -Force
 # VcRedist
 
 
