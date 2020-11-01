@@ -1,7 +1,3 @@
-Write-Host "RUNNING: setup.ps1   v20201101a"
-Write-Host "Installs Chocolatey, Boxstarter, and runs next script to build fresh Windows 10 machine."
-Write-Host ""
-
 # USAGE (WITH CLICK-ONCE COMPATIBLE BROWSER LIKE IE): 
 #   START https://boxstarter.org/package/url?https://raw.githubusercontent.com/AquaeAtrae/Win10Ent-devbox-2/master/setup.ps1
 #
@@ -173,6 +169,10 @@ if (-not $TzHostDomainDone) {
 	[console]::beep(500,300) # pitch, ms
 
 }
+
+Write-Host "RUNNING: setup.ps1   v20201101b"
+Write-Host "Installs Chocolatey, Boxstarter, and runs next script to build fresh Windows 10 machine."
+Write-Host ""
 
 #######################
 # RDP Remote Access, PS Remoting, Ansible, Jump Desktop, OpenVPN with configs, Firewall rules
