@@ -367,7 +367,7 @@ Enable-WindowsOptionalFeature -FeatureName WorkFolders-Client -Online -All -NoRe
 Enable-WindowsOptionalFeature -FeatureName ServicesForNFS-ClientOnly -Online -All -NoRestart
 Enable-WindowsOptionalFeature -FeatureName ClientForNFS-Infrastructure -Online -All -NoRestart
 Enable-WindowsOptionalFeature -FeatureName NFS-Administration -Online -All -NoRestart
-Disable-WindowsOptionalFeature -FeatureName Internet-Explorer-Optional-amd64 -Online -NoRestart
+Enable-WindowsOptionalFeature -FeatureName Internet-Explorer-Optional-amd64 -Online -NoRestart
 Disable-WindowsOptionalFeature -FeatureName IIS-WebServerRole -Online -NoRestart
 Disable-WindowsOptionalFeature -FeatureName MediaPlayback -Online -NoRestart
 Disable-WindowsOptionalFeature -FeatureName WindowsMediaPlayer -Online -NoRestart
