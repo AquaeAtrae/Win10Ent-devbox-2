@@ -235,7 +235,7 @@ Move-LibraryDirectory "My Music" "$homePath\Music"
 
 
 
-Install-Script -Name driverharvest
+Install-Script -Name driverharvest -Force
 # driverharvest   # create baseline list, run again later to collect added drivers
 
 'NEXT: Drivers (run driverharvest first for baseline?)'
@@ -254,7 +254,7 @@ Install-Script -Name Get-DriversPackFromDell
 
 choco install dellcommandupdate
 choco install dell-update
-choco install nvidia-display-driver
+# choco install nvidia-display-driver  # FAILS AND BREAKS SCRIPT
 choco install geforce-experience
 # choco install msiafterburner
 choco install samsung-magician
